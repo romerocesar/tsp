@@ -21,6 +21,7 @@ evaporation_rate = 0.5
 q = 100
 num_iterations = 50
 
+
 # Define the Ant System algorithm
 def ant_system(dist_matrix, pheromone_matrix, alpha, beta, evaporation_rate, q, num_iterations):
     best_tour = None
@@ -39,6 +40,7 @@ def ant_system(dist_matrix, pheromone_matrix, alpha, beta, evaporation_rate, q, 
         update_pheromone_matrix(pheromone_matrix, tours, tour_distances, evaporation_rate, q)
     return best_tour, best_distance
 
+
 # Define the tour construction algorithm
 def construct_tour(dist_matrix, pheromone_matrix, alpha, beta):
     tour = []
@@ -51,6 +53,7 @@ def construct_tour(dist_matrix, pheromone_matrix, alpha, beta):
         unvisited_cities.remove(next_city)
         current_city = next_city
     return tour
+
 
 # Define the city selection algorithm
 def choose_next_city(dist_matrix, pheromone_matrix, current_city, unvisited_cities, alpha, beta):
@@ -65,10 +68,19 @@ def choose_next_city(dist_matrix, pheromone_matrix, current_city, unvisited_citi
     city_probs = [(city, prob / total_prob) for city, prob in city_probs]
     return max(city_probs, key=lambda x: x[1])[0]
 
+
 # Define the pheromone update algorithm
 def update_pheromone_matrix(pheromone_matrix, tours, tour_distances, evaporation_rate, q):
     pheromone_matrix *= evaporation_rate
     for tour, tour_distance in zip(tours, tour_distances):
         for city1, city2 in tour:
             pheromone_matrix[city1, city2] += q / tour_distance
-            pheromone_matrix[city2
+            pheromone_matrix[city2, city1] = pheromone_matrix[city1, city2]
+
+
+def calculate_tour_distance(dist_matrix, tour):
+    distance = 0
+    for i in range(len(tour)):
+        city1, city2 = tour[i]
+        distance += dist_matrix[city1, city2]
+    return distance
