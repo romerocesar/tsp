@@ -48,9 +48,14 @@ class ACO:
             tour.append((current_city, next_city))
             unvisited_cities.remove(next_city)
             current_city = next_city
+        # close the loop once all cities have been visited
+        first, last = tour[0][0], tour[-1][1]
+        tour.append((last, first))
         return tour
 
     def choose_next_city(self, distances, pheromones, current_city, unvisited_cities):
+        '''TODO: simplify the selection based on prob - we don\'t
+        actually need to keep track of total_prob or build the list near the end'''
         city_probs = []
         total_prob = 0
         for city in unvisited_cities:
@@ -63,7 +68,7 @@ class ACO:
         return max(city_probs, key=lambda x: x[1])[0]
 
     def update_pheromones(self, pheromones, tours, tour_distances):
-        pheromones *= self.e
+        pheromones *= self.e  # evaporate some pheromone
         for tour, tour_distance in zip(tours, tour_distances):
             for city1, city2 in tour:
                 pheromones[city1, city2] += self.q / tour_distance
