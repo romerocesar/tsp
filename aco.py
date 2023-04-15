@@ -54,18 +54,22 @@ class ACO:
         return tour
 
     def choose_next_city(self, distances, pheromones, current_city, unvisited_cities):
-        '''TODO: simplify the selection based on prob - we don\'t
-        actually need to keep track of total_prob or build the list near the end'''
-        city_probs = []
-        total_prob = 0
+        '''picks the city with the highest score among
+        unvisited_cities. the score is a function of the pheromone and
+        distance between current_city and the next city
+
+        TODO: should I have a tabu list of cities per ant? if so:
+        - how can the ant complete the tour?
+        '''
+        ans, p = 0, 0
         for city in unvisited_cities:
             pheromone = pheromones[current_city, city]
             distance = distances[current_city, city]
             prob = (pheromone ** self.alpha) * ((1 / distance) ** self.beta)
-            city_probs.append((city, prob))
-            total_prob += prob
-        city_probs = [(city, prob / total_prob) for city, prob in city_probs]
-        return max(city_probs, key=lambda x: x[1])[0]
+            if prob > p:
+                ans = city
+                p = prob
+        return ans
 
     def update_pheromones(self, pheromones, tours, tour_distances):
         pheromones *= self.e  # evaporate some pheromone

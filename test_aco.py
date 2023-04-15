@@ -36,7 +36,7 @@ def test_construct_tour():
     assert len(tour) == len(distances)
 
 
-def test_update_pheromoes():
+def test_update_pheromones():
     # arrange
     aco = ACO()
     # assert
@@ -44,4 +44,22 @@ def test_update_pheromoes():
 
 
 def test_next_city():
-    assert 0
+    # arrange equal pheromones
+    aco = ACO()
+    pheromones = np.ones((3, 3))
+    distances = np.ones((3, 3))
+    distances[0, 1] = 0.5
+    expected = 1
+    # act
+    actual = aco.choose_next_city(distances, pheromones, 0, {1, 2})
+    # assert
+    assert expected == actual
+    # arrange equal distances
+    pheromones = np.ones((3, 3))
+    distances = np.ones((3, 3))
+    pheromones[0, 1] = 2
+    expected = 1
+    # act
+    actual = aco.choose_next_city(distances, pheromones, 0, {1, 2})
+    # assert
+    assert actual == expected
