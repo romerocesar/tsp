@@ -10,11 +10,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 def test_aco():
     # test
-    distances = np.array([[0, 2.23606798, 3.16227766, 3.60555128],
-                          [2.23606798, 0, 2.23606798, 2.82842712],
-                          [3.16227766, 2.23606798, 0, 2.23606798],
-                          [3.60555128, 2.82842712, 2.23606798, 0]])
-    aco = ACO(n=2, iterations=2)
+    distances = np.random.randint(1, 10, size=(3, 3))
+    distances = (distances + distances.T) / 2  # make it symmetrical
+    aco = ACO()
     upper_bound = np.sum(np.amax(distances, axis=1))
     # act
     tour, cost = aco.solve(distances)
@@ -36,11 +34,14 @@ def test_construct_tour():
     assert len(tour) == len(distances)
 
 
-def test_update_pheromones():
+def test_evaporation_rate():
     # arrange
-    aco = ACO()
+    aco = ACO(e=0.5)
+    pheromones = np.ones((3, 3))
+    # act
+    aco.update_pheromones(pheromones, [], [])
     # assert
-    assert 0
+    assert np.array_equal(pheromones, np.ones_like(pheromones)*0.5)
 
 
 def test_next_city():

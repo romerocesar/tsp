@@ -11,15 +11,15 @@ logging.basicConfig(level=logging.DEBUG)
 class ACO:
     '''ant colony optimization specifically for the traveling salesman problem'''
 
-    def __init__(self, n=10, alpha=1, beta=5, e=0.5, q=100, iterations=50):
+    def __init__(self, n=10, alpha=1, beta=5, e=0.5, iterations=50):
         self.n = n
         self.alpha = alpha
         self.beta = beta
         self.e = e  # evaporation_rate
-        self.q = q
         self.iterations = iterations
 
     def solve(self, distances):
+        logger.debug(f'looking for a tour with {distances=}')
         pheromones = np.ones(distances.shape) / len(distances)
         best_tour = None
         best_distance = float("inf")
@@ -35,6 +35,7 @@ class ACO:
                     best_tour = tour
                     best_distance = tour_distance
             self.update_pheromones(pheromones, tours, tour_distances)
+        logger.info(f'found {best_tour=} and {best_distance=}')
         return best_tour, best_distance
 
     def construct_tour(self, distances, pheromones):
@@ -72,10 +73,14 @@ class ACO:
         return ans
 
     def update_pheromones(self, pheromones, tours, tour_distances):
+        '''updates the pheromones. at each edge, the pheromone
+        decreases according to the evaporation rate self.e and
+        increases by the sum of 1/L of the path found by each ant.
+        '''
         pheromones *= self.e  # evaporate some pheromone
         for tour, tour_distance in zip(tours, tour_distances):
             for city1, city2 in tour:
-                pheromones[city1, city2] += self.q / tour_distance
+                pheromones[city1, city2] += 1 / tour_distance
                 pheromones[city2, city1] = pheromones[city1, city2]
 
     @staticmethod
@@ -85,3 +90,13 @@ class ACO:
             city1, city2 = tour[i]
             distance += distances[city1, city2]
         return distance
+
+
+def main():
+    distances = np.random.randint(1, 10, size=(9, 9))
+    distances = (distances + distances.T) / 2
+    ACO().solve(distances)
+
+
+if __name__ == '__main__':
+    main()
